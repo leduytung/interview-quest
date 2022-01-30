@@ -11,6 +11,7 @@
 #  updated_at :datetime         not null
 #
 class Traveler < ApplicationRecord
+  enum app_identify: Constant::APP_IDENTIFY
   attr_accessor :seeding
 
   after_create :send_welcome_email, unless: :seeding
