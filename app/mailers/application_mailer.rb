@@ -2,6 +2,24 @@
 
 class ApplicationMailer < MandrillMailer::TemplateMailer
   default from: 'no-reply@bridj.com'
+  BOOKING_SUCCESS_EMAIL_TEMPLATES = {
+    'bridj' => 'admin-booking-success-au',
+    'jbird' => 'jbird-booking-confirmed-au'
+  }
+
+  BOOKING_CANCELLED_EMAIL_TEMPLATES = {
+    'bridj' => 'admin-booking-cancel-au',
+    'jbird' => 'jbird-booking-cancelled-au'
+  }
+
+  WELCOME_EMAIL_TEMPLATES = {
+    'bridj' => 'admin-welcome-email-au',
+    'jbird' => 'jbird-welcome-au'
+  }
+
+  def send_email(data)
+    mandrill_mail(data)
+  end
 
   def booking_success(traveler_id, booking_id, price, currency)
     traveler = Traveler.find(traveler_id)
@@ -13,9 +31,9 @@ class ApplicationMailer < MandrillMailer::TemplateMailer
     booking_time = booking.created_at.in_time_zone(time_zone)
     travel_time = booking.pickup_scheduled_at.in_time_zone(time_zone)
 
-    mandrill_mail(
-      template: 'admin-booking-success-au',
-      subject: I18n.t('user_mailer.booking_success_subject'),
+    send_email(
+      template: BOOKING_SUCCESS_EMAIL_TEMPLATES[booking.app_identify],
+      subject: I18n.t("user_mailer.#{booking.app_identify}.booking_success_subject"),
       to: { email: traveler.email, name: traveler.first_name },
       vars: {
         'FNAME' => traveler.first_name,
@@ -51,9 +69,9 @@ class ApplicationMailer < MandrillMailer::TemplateMailer
   def send_welcome_email(traveler_id)
     user = Traveler.find(traveler_id)
 
-    mandrill_mail(
-      template: 'admin-welcome-email-au',
-      subject: I18n.t('user_mailer.send_welcome_email_subject'),
+    send_email(
+      template: WELCOME_EMAIL_TEMPLATES[user.app_identify],
+      subject: I18n.t("user_mailer.#{user.app_identify}.send_welcome_email_subject"),
       to: { email: user.email, name: user.first_name },
       vars: { 'FNAME' => user.first_name },
       inline_css: true
@@ -70,9 +88,9 @@ class ApplicationMailer < MandrillMailer::TemplateMailer
     travel_time = booking.pickup_scheduled_at
     origin = booking.origin.name
 
-    mandrill_mail(
-      template: 'admin-booking-cancel-au',
-      subject: I18n.t('user_mailer.cancelled_booking_subject'),
+    send_email(
+      template: BOOKING_CANCELLED_EMAIL_TEMPLATES[booking.app_identify],
+      subject: I18n.t("user_mailer.#{booking.app_identify}.cancelled_booking_subject"),
       to: { email: traveler.email, name: traveler.first_name },
       vars: {
         'FNAME' => traveler.first_name,

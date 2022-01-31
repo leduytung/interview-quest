@@ -8,7 +8,8 @@ describe ApplicationMailer, type: :mailer do
     Traveler.create! first_name: 'Donald',
                      last_name: 'Duck',
                      email: 'donald@disney.com',
-                     seeding: true
+                     seeding: true,
+                     app_identify: 'bridj'
   end
   let(:origin) do
     Location.create! zone_id: zone.id,
@@ -32,7 +33,8 @@ describe ApplicationMailer, type: :mailer do
                       pickup_scheduled_at: utc_departure_time,
                       dropoff_scheduled_at: utc_departure_time + 22.minutes,
                       price: 3.0,
-                      seeding: true
+                      seeding: true,
+                      app_identify: 'bridj'
     end
   end
 
@@ -76,7 +78,7 @@ describe ApplicationMailer, type: :mailer do
           receive(:mandrill_mail)
             .with(
               template: 'admin-booking-success-au',
-              subject: I18n.t('user_mailer.booking_success_subject'),
+              subject: I18n.t("user_mailer.#{booking.app_identify}.booking_success_subject"),
               to: { email: traveler.email, name: traveler.first_name },
               vars: hash_including(
                 'PAYMENT_METHOD' => pm[:display_name]
@@ -120,7 +122,7 @@ describe ApplicationMailer, type: :mailer do
       expect_any_instance_of(ApplicationMailer).to(
         receive(:mandrill_mail)
           .with(template: 'admin-welcome-email-au',
-                subject: I18n.t('user_mailer.send_welcome_email_subject'),
+                subject: I18n.t("user_mailer.#{traveler.app_identify}.send_welcome_email_subject"),
                 to: { email: traveler.email, name: traveler.first_name },
                 vars: { 'FNAME' => traveler.first_name },
                 inline_css: true)
