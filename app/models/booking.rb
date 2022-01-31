@@ -16,6 +16,7 @@
 #  updated_at           :datetime         not null
 #
 class Booking < ApplicationRecord
+  enum app_identify: Constant::APP_IDENTIFY
   belongs_to :zone
   belongs_to :traveler
 

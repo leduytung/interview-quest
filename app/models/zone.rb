@@ -12,6 +12,7 @@
 #  updated_at :datetime         not null
 #
 class Zone < ApplicationRecord
+  enum app_identify: Constant::APP_IDENTIFY
   has_many :locations
   has_many :bookings
 end
